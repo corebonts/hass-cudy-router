@@ -29,9 +29,10 @@
         "step": {
             "init": {
                 "data": {
-                    "device_list": "Comma separated list of devices (MAC or hostname) for detailed reports.",
+                    "device_list": "Comma separated list of devices (MAC or hostname) for detailed reports",
                     "host": "Host",
                     "password": "Password",
+                    "scan_interval": "Scan interval",
                     "username": "Username"
                 },
                 "title": "Configure router"

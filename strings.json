@@ -26,7 +26,8 @@
       "init": {
         "title": "Configure router",
         "data": {
-          "device_list": "Comma separated list of devices (MAC or hostname) for detailed reports.",
+          "device_list": "Comma separated list of devices (MAC or hostname) for detailed reports",
+          "scan_interval": "Scan interval",
           "host": "[%key:common::config_flow::data::host%]",
           "username": "[%key:common::config_flow::data::username%]",
           "password": "[%key:common::config_flow::data::password%]"

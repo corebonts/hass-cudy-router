@@ -7,10 +7,17 @@ from typing import Any
 import voluptuous as vol
 
 from homeassistant import config_entries
-from homeassistant.const import CONF_HOST, CONF_NAME, CONF_PASSWORD, CONF_USERNAME
+from homeassistant.const import (
+    CONF_HOST,
+    CONF_NAME,
+    CONF_PASSWORD,
+    CONF_SCAN_INTERVAL,
+    CONF_USERNAME,
+)
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.exceptions import HomeAssistantError
+from homeassistant.helpers import selector
 
 from .router import CudyRouter
 from .const import DOMAIN, OPTIONS_DEVICELIST
@@ -96,9 +103,11 @@ class CudyRouterOptionsFlowHandler(config_entries.OptionsFlow):
 
         if user_input is not None:
             logging.debug("user_input: %s", user_input)
-            device_list = user_input.get(OPTIONS_DEVICELIST) or True
+            device_list = user_input.get(OPTIONS_DEVICELIST) or ""
+            scan_interval = user_input.get(CONF_SCAN_INTERVAL) or 15
 
             options[OPTIONS_DEVICELIST] = device_list
+            options[CONF_SCAN_INTERVAL] = scan_interval
 
             # Save if there's no errors, else fall through and show the form again
             if not errors:
@@ -112,6 +121,18 @@ class CudyRouterOptionsFlowHandler(config_entries.OptionsFlow):
                         OPTIONS_DEVICELIST,
                         default=options.get(OPTIONS_DEVICELIST) or "",
                     ): str,
+                    vol.Optional(
+                        CONF_SCAN_INTERVAL,
+                        default=options.get(CONF_SCAN_INTERVAL) or 15,
+                    ): selector.NumberSelector(
+                        selector.NumberSelectorConfig(
+                            mode=selector.NumberSelectorMode.BOX,
+                            unit_of_measurement="seconds",
+                            min=5,
+                            max=60 * 60,
+                            step=5,
+                        ),
+                    ),
                 }
             ),
             errors=errors,

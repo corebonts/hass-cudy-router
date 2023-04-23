@@ -5,7 +5,7 @@ from typing import Any
 
 import async_timeout
 
-from homeassistant.const import CONF_HOST
+from homeassistant.const import CONF_HOST, CONF_SCAN_INTERVAL
 
 from .router import CudyRouter
 
@@ -31,11 +31,12 @@ class CudyRouterDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         self.config_entry = entry
         self.host: str = entry.data[CONF_HOST]
         self.api = api
+        scan_interval = (entry.options and entry.options.get(CONF_SCAN_INTERVAL)) or 15
         super().__init__(
             hass,
             _LOGGER,
             name=f"{DOMAIN} - {self.host}",
-            update_interval=timedelta(seconds=10),
+            update_interval=timedelta(seconds=scan_interval),
         )
 
     async def _async_update_data(self) -> dict[str, Any]:
