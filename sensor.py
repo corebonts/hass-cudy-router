@@ -180,6 +180,24 @@ SENSOR_TYPES = {
         name_suffix="top uploader hostname",
         icon="mdi:upload-network-outline",
     ),
+    ("devices", "total_down_speed"): CudyRouterSensorEntityDescription(
+        key="total_down_speed",
+        module="devices",
+        name_suffix="total download speed",
+        device_class=SensorDeviceClass.DATA_RATE,
+        native_unit_of_measurement=UnitOfDataRate.MEGABITS_PER_SECOND,
+        icon="mdi:upload",
+        state_class=SensorStateClass.MEASUREMENT,
+    ),
+    ("devices", "total_up_speed"): CudyRouterSensorEntityDescription(
+        key="total_up_speed",
+        module="devices",
+        name_suffix="total upload speed",
+        device_class=SensorDeviceClass.DATA_RATE,
+        native_unit_of_measurement=UnitOfDataRate.MEGABITS_PER_SECOND,
+        icon="mdi:upload",
+        state_class=SensorStateClass.MEASUREMENT,
+    ),
 }
 
 
