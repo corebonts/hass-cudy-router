@@ -7,21 +7,22 @@ from typing import Any
 import voluptuous as vol
 
 from homeassistant import config_entries
+from homeassistant.const import CONF_HOST, CONF_NAME, CONF_PASSWORD, CONF_USERNAME
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.exceptions import HomeAssistantError
 
 from .router import CudyRouter
-from .const import DOMAIN
+from .const import DOMAIN, OPTIONS_DEVICELIST
 
 _LOGGER = logging.getLogger(__name__)
 
 STEP_USER_DATA_SCHEMA = vol.Schema(
     {
-        vol.Optional("name"): str,
-        vol.Required("host"): str,
-        vol.Required("username"): str,
-        vol.Required("password"): str,
+        vol.Optional(CONF_NAME): str,
+        vol.Required(CONF_HOST): str,
+        vol.Required(CONF_USERNAME): str,
+        vol.Required(CONF_PASSWORD): str,
     }
 )
 
@@ -29,7 +30,7 @@ STEP_USER_DATA_SCHEMA = vol.Schema(
 async def validate_input(hass: HomeAssistant, data: dict[str, Any]):
     """Validate user input after configuration."""
 
-    router = CudyRouter(hass, data["host"], data["username"], data["password"])
+    router = CudyRouter(hass, data[CONF_HOST], data[CONF_USERNAME], data[CONF_PASSWORD])
 
     if not await hass.async_add_executor_job(router.authenticate):
         raise InvalidAuth
@@ -55,9 +56,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         errors: dict[str, str] = {}
         if user_input is not None:
             try:
-                title = user_input["host"]
-                if user_input.get("name"):
-                    title = user_input["name"]
+                title = user_input[CONF_HOST]
+                if user_input.get(CONF_NAME):
+                    title = user_input[CONF_NAME]
 
                 await validate_input(self.hass, user_input)
             except CannotConnect:
@@ -95,19 +96,9 @@ class CudyRouterOptionsFlowHandler(config_entries.OptionsFlow):
 
         if user_input is not None:
             logging.debug("user_input: %s", user_input)
-            device_list = user_input.get("device_list") or True
+            device_list = user_input.get(OPTIONS_DEVICELIST) or True
 
-            try:
-                x = device_list
-            except CannotConnect:
-                errors["base"] = "cannot_connect"
-            except InvalidAuth:
-                errors["base"] = "invalid_auth"
-            except Exception:  # pylint: disable=broad-except
-                _LOGGER.exception("Unexpected exception")
-                errors["base"] = "unknown"
-
-            options["device_list"] = device_list
+            options[OPTIONS_DEVICELIST] = device_list
 
             # Save if there's no errors, else fall through and show the form again
             if not errors:
@@ -118,7 +109,8 @@ class CudyRouterOptionsFlowHandler(config_entries.OptionsFlow):
             data_schema=vol.Schema(
                 {
                     vol.Optional(
-                        "device_list", default=options.get("device_list") or ""
+                        OPTIONS_DEVICELIST,
+                        default=options.get(OPTIONS_DEVICELIST) or "",
                     ): str,
                 }
             ),

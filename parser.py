@@ -8,6 +8,8 @@ from datetime import datetime
 
 from homeassistant.const import STATE_UNAVAILABLE
 
+from .const import SECTION_DETAILED
+
 
 def add_unique(data: dict[str, Any], key: str, value: Any):
     """Adds a new entry with unique ID"""
@@ -22,6 +24,7 @@ def add_unique(data: dict[str, Any], key: str, value: Any):
 
 def parse_tables(input_html: str) -> dict[str, Any]:
     """Parses an HTML table extracting key-value pairs"""
+
     data: dict[str, str] = {}
     soup = BeautifulSoup(input_html, "html.parser")
     tables = soup.find_all("table")
@@ -43,6 +46,7 @@ def parse_tables(input_html: str) -> dict[str, Any]:
 
 def parse_speed(input_string: str) -> float:
     """Parses transfer speed as megabits per second"""
+
     if not input_string:
         return None
     if input_string.lower().endswith(" kbps"):
@@ -60,8 +64,8 @@ def get_all_devices(input_html: str) -> dict[str, Any]:
     """Parses an HTML table extracting key-value pairs"""
     devices = []
     soup = BeautifulSoup(input_html, "html.parser")
-    for br in soup.find_all("br"):
-        br.replace_with("\n" + br.text)
+    for br_element in soup.find_all("br"):
+        br_element.replace_with("\n" + br_element.text)
     tables = soup.find_all("table")
     for table in tables:
         for row in table.find_all("tr"):
@@ -96,6 +100,7 @@ def get_all_devices(input_html: str) -> dict[str, Any]:
 
 def get_sim_value(input_html: str) -> str:
     """Gets the SIM slot value out of the displayed icon"""
+
     soup = BeautifulSoup(input_html, "html.parser")
     sim_icon = soup.css.select_one("i.icon[class*='sim']")
     if sim_icon:
@@ -150,6 +155,7 @@ def get_band(raw_band_info: str):
 
 def get_seconds_duration(raw_duration: str) -> int:
     """Parses string duration and returns it as seconds"""
+
     if not raw_duration:
         return None
     duration_parts = raw_duration.lower().split()
@@ -191,13 +197,13 @@ def parse_devices(input_html: str, device_list_str: str) -> dict[str, Any]:
         data["top_uploader_mac"] = {"value": top_upload_device.get("mac")}
         data["top_uploader_hostname"] = {"value": top_upload_device.get("hostname")}
 
-        data["detailed"] = {}
+        data[SECTION_DETAILED] = {}
         device_list = [x.strip() for x in (device_list_str or "").split(",")]
         for device in devices:
             if device.get("mac") in device_list:
-                data["detailed"][device.get("mac")] = device
+                data[SECTION_DETAILED][device.get("mac")] = device
             if device.get("hostname") in device_list:
-                data["detailed"][device.get("hostname")] = device
+                data[SECTION_DETAILED][device.get("hostname")] = device
 
     return data
 

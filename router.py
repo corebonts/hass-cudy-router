@@ -6,6 +6,8 @@ import requests
 import logging
 import urllib.parse
 from http.cookies import SimpleCookie
+
+from .const import MODULE_DEVICES, MODULE_MODEM, OPTIONS_DEVICELIST
 from .parser import parse_devices, parse_modem_info
 
 from homeassistant.core import HomeAssistant
@@ -15,34 +17,6 @@ _LOGGER = logging.getLogger(__name__)
 MIN_TIME_BETWEEN_UPDATES = timedelta(seconds=15)
 SCAN_INTERVAL = timedelta(seconds=30)
 RETRY_INTERVAL = timedelta(seconds=300)
-
-SAMPLE_DATA = {
-    "modem": {
-        "network": {"value": "Yettel HU", "attributes": {"MCC": "216", "MNC": "01"}},
-        "uptime": {"value": 3600, "unit": "seconds"},
-        "cell": {
-            "value": 54103,
-            "attributes": {"ID": 54103, "eNB": 211, "Sector": 87, "PCID": 260},
-        },
-        "signal": {
-            "value": 3,
-            "attributes": {"RSSI": 20, "RSRP": -107, "RSRQ": -13, "SINR": 9},
-        },
-        "band": {
-            "value": "B3",
-            "attributes": {
-                "DL Bandwidth": 20,
-                "UL Bandwidth": 20,
-                "PCC": "B3",
-                "PCC DL Bandwidth": 20,
-                "PCC UL Bandwidth": 20,
-                "SCC": "B20",
-                "SCC DL Bandwidth": 5,
-                "SCC UL Bandwidth": 5,
-            },
-        },
-    }
-}
 
 
 class CudyRouter:
@@ -112,7 +86,7 @@ class CudyRouter:
                     return response.text
                 else:
                     break
-            except Exception:
+            except Exception:  # pylint: disable=broad-except
                 pass
 
         _LOGGER.error("Error retrieving data from %s", url)
@@ -125,14 +99,14 @@ class CudyRouter:
 
         data: dict[str, Any] = {}
 
-        data["modem"] = parse_modem_info(
+        data[MODULE_MODEM] = parse_modem_info(
             f"{await hass.async_add_executor_job(self.get, 'admin/network/gcom/status')}{await hass.async_add_executor_job(self.get, 'admin/network/gcom/status?detail=1')}"
         )
-        data["devices"] = parse_devices(
+        data[MODULE_DEVICES] = parse_devices(
             await hass.async_add_executor_job(
                 self.get, "admin/network/devices/devlist?detail=1"
             ),
-            options and options.get("device_list"),
+            options and options.get(OPTIONS_DEVICELIST),
         )
 
         return data

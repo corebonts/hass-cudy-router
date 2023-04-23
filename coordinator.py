@@ -5,6 +5,8 @@ from typing import Any
 
 import async_timeout
 
+from homeassistant.const import CONF_HOST
+
 from .router import CudyRouter
 
 from homeassistant.config_entries import ConfigEntry
@@ -27,7 +29,7 @@ class CudyRouterDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         """Initialize router data."""
         self.hass = hass
         self.config_entry = entry
-        self.host: str = entry.data["host"]
+        self.host: str = entry.data[CONF_HOST]
         self.api = api
         super().__init__(
             hass,

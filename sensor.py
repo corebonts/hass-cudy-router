@@ -2,52 +2,37 @@
 from __future__ import annotations
 from dataclasses import dataclass
 
-from datetime import timedelta
-import logging
 import re
 from typing import Any
 
-import requests
-import voluptuous as vol
-from .const import DOMAIN
+from .const import (
+    DOMAIN,
+    MODULE_DEVICES,
+    MODULE_MODEM,
+    OPTIONS_DEVICELIST,
+    SECTION_DETAILED,
+)
 from .coordinator import CudyRouterDataUpdateCoordinator
 
 from homeassistant.components.sensor import (
-    PLATFORM_SCHEMA,
     SensorEntity,
     SensorEntityDescription,
 )
-from homeassistant.components.sensor.const import SensorDeviceClass, SensorStateClass
+from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     CONF_HOST,
-    CONF_PORT,
+    CONF_NAME,
     SIGNAL_STRENGTH_DECIBELS,
     SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
     UnitOfDataRate,
     UnitOfTime,
 )
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.exceptions import PlatformNotReady
-import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType, StateType
+from homeassistant.helpers.typing import StateType
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
-from homeassistant.util import Throttle
-from homeassistant.util.dt import utcnow
-
-_LOGGER = logging.getLogger(__name__)
-
-STATE_MIN_VALUE = "minimal_value"
-STATE_MAX_VALUE = "maximum_value"
-STATE_VALUE = "value"
-STATE_OBJECT = "object"
-CONF_INTERVAL = "interval"
-
-MIN_TIME_BETWEEN_UPDATES = timedelta(seconds=15)
-SCAN_INTERVAL = timedelta(seconds=30)
-RETRY_INTERVAL = timedelta(seconds=30)
 
 
 @dataclass
@@ -251,7 +236,7 @@ async def async_setup_entry(
     coordinator: CudyRouterDataUpdateCoordinator = hass.data[DOMAIN][
         config_entry.entry_id
     ]
-    name = as_name(config_entry.data.get("name") or config_entry.data.get("host"))
+    name = as_name(config_entry.data.get(CONF_NAME) or config_entry.data.get(CONF_HOST))
     entities = []
 
     for module, sensors in coordinator.data.items():
@@ -272,7 +257,8 @@ async def async_setup_entry(
     )
     options = config_entry.options
     device_list = [
-        x.strip() for x in ((options and options.get("device_list")) or "").split(",")
+        x.strip()
+        for x in ((options and options.get(OPTIONS_DEVICELIST)) or "").split(",")
     ]
 
     for device_id in device_list:
@@ -336,7 +322,11 @@ class CudyRouterDeviceSensor(
         """Return the state of the resources."""
         if not self.coordinator.data:
             return None
-        device = self.coordinator.data["devices"].get("detailed").get(self.device_key)
+        device = (
+            self.coordinator.data[MODULE_DEVICES]
+            .get(SECTION_DETAILED)
+            .get(self.device_key)
+        )
         return device and device.get(self.entity_description.key)
 
 
@@ -396,7 +386,7 @@ class CudyRouterSignalSensor(CudyRouterSensor):
     @callback
     def async_write_ha_state(self) -> None:
         data = self.coordinator.data
-        modem_data = data and data.get("modem")
+        modem_data = data and data.get(MODULE_MODEM)
         value = modem_data.get("signal") and modem_data.get("signal").get("value")
         icon = "mdi:network-strength-outline"
         if not value:
