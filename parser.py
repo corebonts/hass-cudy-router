@@ -162,21 +162,21 @@ def get_seconds_duration(raw_duration: str) -> int:
     duration = relativedelta()
 
     for i, part in enumerate(duration_parts):
-        if i == 0:
-            continue
-        if part.startswith("year"):
-            duration += relativedelta(years=as_int(duration_parts[i - 1]))
-        if part.startswith("month"):
-            duration += relativedelta(months=as_int(duration_parts[i - 1]))
-        if part.startswith("week"):
-            duration += relativedelta(weeks=as_int(duration_parts[i - 1]))
-        if part.startswith("day"):
-            duration += relativedelta(days=as_int(duration_parts[i - 1]))
-        elif part.count(":") == 2:
+        if part.count(":") == 2:
             hours, minutes, seconds = part.split(":")
             duration += relativedelta(
                 hours=as_int(hours), minutes=as_int(minutes), seconds=as_int(seconds)
             )
+        elif i == 0:
+            continue
+        elif part.startswith("year"):
+            duration += relativedelta(years=as_int(duration_parts[i - 1]))
+        elif part.startswith("month"):
+            duration += relativedelta(months=as_int(duration_parts[i - 1]))
+        elif part.startswith("week"):
+            duration += relativedelta(weeks=as_int(duration_parts[i - 1]))
+        elif part.startswith("day"):
+            duration += relativedelta(days=as_int(duration_parts[i - 1]))
 
     # Get absolute duration from relative duration (considering different month lengths)
     return (datetime.now() - (datetime.now() - duration)).total_seconds()
