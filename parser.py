@@ -219,7 +219,11 @@ def parse_modem_info(input_html: str) -> dict[str, Any]:
 
     raw_data = parse_tables(input_html)
     cellid = as_int(raw_data.get("Cell ID"))
-    pcc = raw_data.get("PCC")
+    pcc = raw_data.get("PCC") or (
+        f"BAND {raw_data.get('Band')} / {raw_data.get('DL Bandwidth')}"
+        if (raw_data.get("Band") and raw_data.get("DL Bandwidth"))
+        else None
+    )
     scc1 = raw_data.get("SCC")
     scc2 = raw_data.get("SCC2")
     scc3 = raw_data.get("SCC3")
