@@ -20,7 +20,10 @@ Although Cudy routers has a JSON RPC interface, it is not open for the public.
 
 ## Installing
 
-Just copy the files to a folder in your `custom_components` folder.
+Create `cudy_router` folder in `config/custom_components` folder and copy repository
+content there. Alternatively it can be cloned in that folder.
+
+Note that the folder name is important to avoid import errors.
 
 ## Contributing
 
