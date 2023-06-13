@@ -269,7 +269,7 @@ def parse_modem_info(input_html: str) -> dict[str, Any]:
             "value": raw_data.get("Cell ID"),
             "attributes": {
                 "id": cellid,
-                "enb": cellid / 256 if cellid else None,
+                "enb": cellid // 256 if cellid else None,
                 "sector": cellid % 256 if cellid else None,
                 "pcid": as_int(raw_data.get("PCID")),
             },
