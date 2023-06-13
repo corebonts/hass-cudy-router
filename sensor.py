@@ -87,7 +87,6 @@ SENSOR_TYPES = {
         module="modem",
         name_suffix="cell information",
         icon="mdi:antenna",
-        state_class=SensorStateClass.MEASUREMENT,
     ),
     ("modem", "rsrp"): CudyRouterSensorEntityDescription(
         key="rsrp",

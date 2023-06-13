@@ -139,6 +139,13 @@ def as_int(string: str | None):
         return None
     return int(string)
 
+def hex_as_int(string: str | None):
+    """Parses hexadecimal string as integer or returns None"""
+
+    if not string:
+        return None
+    return int(string, 16)
+
 
 def get_band(raw_band_info: str):
     """Gets band information"""
@@ -218,7 +225,7 @@ def parse_modem_info(input_html: str) -> dict[str, Any]:
     """Parses modem info page"""
 
     raw_data = parse_tables(input_html)
-    cellid = as_int(raw_data.get("Cell ID"))
+    cellid = hex_as_int(raw_data.get("Cell ID"))
     pcc = raw_data.get("PCC") or (
         f"BAND {raw_data.get('Band')} / {raw_data.get('DL Bandwidth')}"
         if (raw_data.get("Band") and raw_data.get("DL Bandwidth"))
@@ -259,7 +266,7 @@ def parse_modem_info(input_html: str) -> dict[str, Any]:
             },
         },
         "cell": {
-            "value": f"{cellid}",
+            "value": raw_data.get("Cell ID"),
             "attributes": {
                 "id": cellid,
                 "enb": cellid / 256 if cellid else None,
