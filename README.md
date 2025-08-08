@@ -20,10 +20,9 @@ Although Cudy routers has a JSON RPC interface, it is not open for the public.
 
 ## Installing
 
-Create `cudy_router` folder in `config/custom_components` folder and copy repository
-content there. Alternatively it can be cloned in that folder.
+[![](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=corebonts&repository=cudy_router&category=integration)
 
-Note that the folder name is important to avoid import errors.
+put the `custom_component/cudy_router` folder into your Home Assistant `custom_components` folder.
 
 ## Contributing
 
