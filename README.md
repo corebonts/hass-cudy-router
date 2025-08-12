@@ -20,7 +20,7 @@ Although Cudy routers has a JSON RPC interface, it is not open for the public.
 
 ## Installing
 
-[![](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=corebonts&repository=cudy_router&category=integration)
+[![](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=corebonts&repository=hass-cudy-router&category=integration)
 
 put the `custom_component/cudy_router` folder into your Home Assistant `custom_components` folder.
 
