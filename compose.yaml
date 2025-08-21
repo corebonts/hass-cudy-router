@@ -1,0 +1,12 @@
+volumes:
+  data:
+
+services:
+  homeassistant:
+    image: lscr.io/linuxserver/homeassistant:latest
+    network_mode: bridge
+    ports:
+      - "8123:8123/tcp"
+    volumes:
+      - data:/config
+      - ./custom_components/cudy_router/:/config/custom_components/cudy_router/
