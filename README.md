@@ -1,3 +1,7 @@
+# ⚠️ Development Stopped
+
+Development on this project has stopped because I no longer own the hardware required for testing and maintenance. The repository is now archived.
+
 # Cudy router integration for Home Assistant
 
 This is an unofficial integration of Cudy routers for Home Assistant.
